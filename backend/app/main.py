@@ -1,12 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.endpoints import router as api_router
-from app.core.config import settings
+from backend.app.api.v1.endpoints.openai_Router import router as api_router
 
 app = FastAPI(
     title="LLM Chat API",
     description="API for interacting with various LLM providers",
-    version="0.1.0",
 )
 
 # Configure CORS

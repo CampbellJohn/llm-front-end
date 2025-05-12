@@ -1,0 +1,25 @@
+# Base image
+FROM python:3.13-slim-bookworm AS base
+
+# Builder stage for installing dependencies
+FROM base AS builder
+RUN mkdir /install
+WORKDIR /install
+COPY requirements.txt /requirements.txt
+# Use pip wheel to build packages
+RUN pip install --no-cache-dir wheel \
+    && pip wheel --no-cache-dir --wheel-dir=/install/wheels -r /requirements.txt
+
+# Final stage
+FROM base
+# Copy only the built wheels and install them
+COPY --from=builder /install/wheels /wheels
+RUN pip install --no-cache-dir --no-index --find-links=/wheels/ /wheels/* \
+    && rm -rf /wheels
+
+# Copy application code
+COPY ./app /app
+WORKDIR /app
+
+# Run the application
+CMD ["uvicorn", "app.main:app", "--host", "127.0.0.1", "--port", "8000"]
