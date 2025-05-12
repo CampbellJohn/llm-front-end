@@ -1,6 +1,6 @@
 from typing import List, Dict, Any, Optional
 from openai import AsyncOpenAI
-from backend.app.api.v1.models.openai_models import Message
+from app.api.v1.models.openai_models import Message
 from app.core.config import settings
 
 async def get_openai_response(

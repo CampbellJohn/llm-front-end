@@ -1,5 +1,6 @@
 python-dotenv==1.1.0
 pydantic==2.11.4
+pydantic-settings==2.9.1
 
 # FastAPI Libraries
 fastapi==0.115.12
@@ -7,12 +8,11 @@ uvicorn==0.34.2
 
 # LLM API Libraries
 #anthropic==0.5.0
-openai==1.3.0
+openai==1.78.0
+httpx==0.28.0
 
-
-#httpx==0.28.1
+# Uncomment as needed
 #python-jose==3.4.0
 #passlib==1.7.4
 #python-multipart==0.0.20
 #bcrypt==4.3.0
-
