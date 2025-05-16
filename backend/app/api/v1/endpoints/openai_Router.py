@@ -3,6 +3,11 @@ from app.api.v1.models.openai_models import ChatRequest, ChatResponse, ModelList
 from app.core.config import settings
 from app.services.openai_service import get_openai_response
 from typing import List, Dict, Any
+from pydantic import BaseModel
+
+class DefaultConfigResponse(BaseModel):
+    provider: str
+    model: str
 
 router = APIRouter()
 
@@ -59,3 +64,13 @@ async def list_models():
     ]
     
     return ModelListResponse(models=models)
+
+@router.get("/default-config", response_model=DefaultConfigResponse)
+async def get_default_config():
+    """
+    Get the default model and provider configuration.
+    """
+    return DefaultConfigResponse(
+        provider=settings.DEFAULT_PROVIDER,
+        model=settings.DEFAULT_MODEL
+    )

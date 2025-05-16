@@ -12,6 +12,8 @@ RUN pip install --no-cache-dir wheel \
 
 # Final stage
 FROM base
+WORKDIR /app
+
 # Copy only the built wheels and install them
 COPY --from=builder /install/wheels /wheels
 RUN pip install --no-cache-dir --no-index --find-links=/wheels/ /wheels/* \
@@ -19,7 +21,6 @@ RUN pip install --no-cache-dir --no-index --find-links=/wheels/ /wheels/* \
 
 # Copy application code
 COPY ./app /app
-WORKDIR /app
 
 # Run the application
-CMD ["uvicorn", "app.main:app", "--host", "127.0.0.1", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
