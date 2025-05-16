@@ -1,49 +1,55 @@
-import React, { useEffect, useRef } from 'react';
-import useChat from '../hooks/useChat';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useChat } from '../hooks/useChat';
 import ChatMessage from './ChatMessage';
 import MessageInput from './MessageInput';
 import { FiRefreshCw } from 'react-icons/fi';
 
-const ChatInterface = ({ selectedModel, selectedProvider }) => {
-  const { messages, isLoading, error, sendMessage, clearMessages } = useChat(
-    [],
-    selectedModel,
-    selectedProvider
-  );
-  
+const ChatInterface = () => {
+  const { messages, isLoading, isStreaming, error, sendMessage, clearMessages } = useChat();
   const messagesEndRef = useRef(null);
+  const [autoScroll, setAutoScroll] = useState(true);
 
-  // Scroll to bottom when messages change
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+  const scrollToBottom = useCallback(() => {
+    if (autoScroll) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages]);
+  }, [autoScroll]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isStreaming, scrollToBottom]);
+
+  const handleScroll = (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+    const isAtBottom = scrollHeight - (scrollTop + clientHeight) < 100;
+    setAutoScroll(isAtBottom);
+  };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="bg-white rounded-lg shadow-sm">
+    <div className="max-w-4xl mx-auto px-4 py-8 h-full flex flex-col">
+      <div className="bg-white rounded-lg shadow-sm flex flex-col flex-grow">
         {/* Messages area */}
-        <div className="chat-container p-4 overflow-y-auto">
+        <div 
+          className="chat-container p-4 overflow-y-auto flex-grow"
+          onScroll={handleScroll}
+        >
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-500">
-              <div className="mb-4 text-center">
-                <h2 className="text-2xl font-bold mb-2">Welcome to LLM Chat</h2>
-                <p className="text-lg">
-                  Start a conversation with {selectedModel}
-                </p>
+              <div className="mb-8 text-center">
+                <h2 className="text-2xl font-bold mb-2">Welcome!</h2>
+                <p className="text-gray-600 mb-6">This is a custom, scalable LLM front-end.</p>
               </div>
               <div className="w-full max-w-md">
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {[
-                    "Tell me about quantum computing",
-                    "Write a short story about a time traveler",
-                    "Explain how neural networks work",
-                    "What are the ethical implications of AI?"
+                    "Which model are you?",
+                    "Tell me about Docker containers.",
+                    "Write me an excel formula.",
+                    "What are your capabilities?"
                   ].map((suggestion, i) => (
                     <button
                       key={i}
-                      className="bg-gray-100 hover:bg-gray-200 rounded-md py-2 px-3 text-left text-sm transition-colors"
+                      className="bg-gray-100 hover:bg-gray-200 rounded-lg py-3 px-4 text-left text-sm transition-colors"
                       onClick={() => sendMessage(suggestion)}
                     >
                       {suggestion}
@@ -73,10 +79,7 @@ const ChatInterface = ({ selectedModel, selectedProvider }) => {
 
         {/* Input area */}
         <div className="border-t border-gray-200 p-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-sm text-gray-500">
-              Model: <span className="font-medium">{selectedModel}</span>
-            </div>
+          <div className="flex items-center justify-end mb-2">
             {messages.length > 0 && (
               <button
                 onClick={clearMessages}
@@ -87,15 +90,14 @@ const ChatInterface = ({ selectedModel, selectedProvider }) => {
               </button>
             )}
           </div>
-          
-          <MessageInput onSendMessage={sendMessage} isLoading={isLoading} />
-          
-          {isLoading && (
-            <div className="text-center mt-4">
-              <div className="inline-block h-4 w-4 border-t-2 border-blue-500 rounded-full animate-spin"></div>
-              <span className="ml-2 text-sm text-gray-500">Assistant is thinking...</span>
-            </div>
-          )}
+          <div className="p-4 border-t border-gray-200 bg-white">
+            <MessageInput 
+              onSend={sendMessage} 
+              isSending={isLoading} 
+              disabled={isStreaming} 
+            />
+            {error && <div className="mt-2 text-red-500 text-sm">{error}</div>}
+          </div>
         </div>
       </div>
     </div>

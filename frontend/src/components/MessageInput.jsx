@@ -1,28 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FiSend } from 'react-icons/fi';
 
-const MessageInput = ({ onSendMessage, isLoading }) => {
+const MessageInput = ({ onSend, isSending = false, disabled = false }) => {
   const [message, setMessage] = useState('');
   const textareaRef = useRef(null);
-
-  useEffect(() => {
-    // Auto-resize textarea
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-    }
-  }, [message]);
+  const isInputDisabled = disabled || isSending;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!message.trim() || isLoading) return;
-    
-    onSendMessage(message);
-    setMessage('');
-    
-    // Reset height after sending
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
+    if (message.trim() && !isInputDisabled) {
+      onSend(message.trim());
+      setMessage('');
     }
   };
 
@@ -33,33 +20,43 @@ const MessageInput = ({ onSendMessage, isLoading }) => {
     }
   };
 
+  // Auto-resize textarea
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 150)}px`;
+    }
+  }, [message]);
+
   return (
     <form onSubmit={handleSubmit} className="w-full">
-      <div className="flex items-end border border-gray-300 rounded-md bg-white p-2">
-        <textarea
-          ref={textareaRef}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Type your message..."
-          className="message-input flex-grow resize-none min-h-[40px] max-h-[200px] outline-none"
-          rows={1}
-          disabled={isLoading}
-        />
+      <div className="flex items-center gap-2">
+        <div className="flex-1 relative">
+          <textarea
+            ref={textareaRef}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={isInputDisabled ? 'Please wait for the response...' : 'Type your message...'}
+            className={`w-full p-3 pr-12 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              isInputDisabled ? 'bg-gray-100 border-gray-200 cursor-not-allowed' : 'border-gray-300'
+            }`}
+            rows="1"
+            style={{ minHeight: '44px' }}
+            disabled={isInputDisabled}
+          />
+        </div>
         <button
           type="submit"
-          className={`ml-2 p-2 rounded-full ${
-            isLoading || !message.trim()
+          disabled={!message.trim() || isInputDisabled}
+          className={`px-4 py-2 h-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${
+            isInputDisabled
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-blue-600 text-white hover:bg-blue-700'
+              : 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500'
           }`}
-          disabled={isLoading || !message.trim()}
         >
-          <FiSend size={18} />
+          {isSending ? 'Sending...' : 'Send'}
         </button>
-      </div>
-      <div className="text-xs text-gray-500 mt-1 text-center">
-        Press Enter to send, Shift+Enter for new line
       </div>
     </form>
   );

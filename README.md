@@ -1,60 +1,58 @@
-# LLM Front End
-This project will act as a starting front-end to an LLM. It will be configured to connect to OpenAI, but will eventually be extended to connect to other LLMs.
-The back-end of this project will be a Docker container running a FastAPI python project.
-The front-end will connect from a docker container running a react UI.
+# LLM Front-End Application
 
-llm-chat-app/
-├── docker-compose.yml
-├── .env.example
-├── backend/
-│   ├── Dockerfile.backend
-│   ├── app/
-│   │   ├── __init__.py
-│   │   ├── main.py
-│   │   ├── api/
-│   │   │   ├── __init__.py
-│   │   │   └── v1/
-│   │   │       ├── endpoints/
-│   │   │       │   ├── __init__.py
-│   │   │       │   └── openai_router.py
-│   │   │       └── models/
-│   │   │           ├── __init__.py
-│   │   │           └── openai_models.py
-│   │   ├── utilities/
-│   │   │   └── __init__.py
-│   │   └── services/
-│   │       ├── __init__.py
-│   │       └── openai_service.py
-│   └── requirements.txt
-└── frontend/
-    ├── Dockerfile.frontend
-    ├── package.json
-    ├── public/
-    │   ├── index.html
-    │   └── favicon.ico
-    └── src/
-        ├── App.js
-        ├── index.js
-        ├── components/
-        │   ├── ChatInterface.jsx
-        │   ├── ChatMessage.jsx
-        │   ├── MessageInput.jsx
-        │   └── ModelSelector.jsx
-        ├── services/
-        │   └── api.js
-        ├── hooks/
-        │   └── useChat.js
-        └── styles/
-            └── main.css
+A containerized chat application with a React frontend and FastAPI backend, designed as a starting point to create a customized chat interface.
+
+![Chat Interface](https://via.placeholder.com/800x500.png?text=Custom+LLM+Front-End)
+
+## Features
+
+- React frontend with responsive design
+- FastAPI backend
+- Docker containerization for easy deployment
+- Styled with Tailwind CSS
+
+## Tech Stack
+
+- **Frontend**: React 18, Tailwind CSS, React Icons
+- **Backend**: FastAPI, Python 3.13
+- **Containerization**: Docker, Docker Compose
+- **Styling**: Tailwind CSS
 
 
-#Favicon Temp Reference
-Extract this package in <your app>/public/.
-In <your app>/public/index.html, remove the existing link markups (they have have attributes rel="icon", rel="apple-touch-icon" and rel="manifest").
-Insert the following code in the head section of <your app>/public/index.html:
+## Getting Started
 
-<link rel="icon" type="image/png" href="%PUBLIC_URL%/favicon-96x96.png" sizes="96x96" />
-<link rel="icon" type="image/svg+xml" href="%PUBLIC_URL%/favicon.svg" />
-<link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico" />
-<link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/apple-touch-icon.png" />
-<link rel="manifest" href="%PUBLIC_URL%/site.webmanifest" />
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/yourusername/llm-front-end.git
+cd llm-front-end
+```
+
+### 2. Set up environment variables
+
+Create a `.env` file in the project root by editing .env.example:
+
+```env
+# Backend
+OPENAI_API_KEY=your_openai_api_key_here
+
+# Frontend (optional, for local development)
+REACT_APP_API_URL=http://localhost:8000
+```
+
+### 3. Build and run with Docker
+
+```bash
+docker-compose up --build
+```
+
+This will:
+1. Build the backend and frontend Docker images
+2. Start both services
+3. Make the application available at `http://localhost:3000`
+
+### 4. Access the application
+
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8000
+- API Documentation: http://localhost:8000/docs

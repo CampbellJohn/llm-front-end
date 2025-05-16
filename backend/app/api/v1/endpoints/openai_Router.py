@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import StreamingResponse
 from app.api.v1.models.openai_models import ChatRequest, ChatResponse, ModelListResponse, ModelInfo, Message
 from app.core.config import settings
-from app.services.openai_service import get_openai_response
-from typing import List, Dict, Any
+from app.services.openai_service import get_openai_response, get_openai_client
+from typing import List, Dict, Any, AsyncGenerator
 from pydantic import BaseModel
+import json
 
 class DefaultConfigResponse(BaseModel):
     provider: str
@@ -42,13 +44,51 @@ async def get_llm_response(request: ChatRequest) -> ChatResponse:
             detail=f"Provider '{provider}' is not supported"
         )
 
-@router.post("/chat", response_model=ChatResponse)
+@router.post("/chat")
 async def chat(request: ChatRequest):
     """
     Send a chat request to the LLM provider.
+    Supports both streaming and non-streaming responses.
     """
-    response = await get_llm_response(request)
-    return response
+    if request.stream:
+        return StreamingResponse(
+            stream_llm_response(request),
+            media_type="text/event-stream"
+        )
+    else:
+        response = await get_llm_response(request)
+        return response
+
+async def stream_llm_response(request: ChatRequest) -> AsyncGenerator[str, None]:
+    """
+    Stream the response from the LLM provider.
+    """
+    provider = request.provider or settings.DEFAULT_PROVIDER
+    model = request.model or settings.DEFAULT_MODEL
+    
+    if provider.lower() != "openai":
+        yield f"data: {json.dumps({'error': f'Provider {provider} is not supported'})}\n\n"
+        return
+
+    try:
+        client = get_openai_client()
+        response = await client.chat.completions.create(
+            model=model,
+            messages=[{"role": m.role, "content": m.content} for m in request.messages],
+            max_tokens=request.max_tokens,
+            temperature=request.temperature,
+            stream=True
+        )
+        
+        async for chunk in response:
+            if chunk.choices and chunk.choices[0].delta.content:
+                yield f"data: {json.dumps(chunk.dict())}\n\n"
+        
+        # Send a done signal
+        yield "data: [DONE]\n\n"
+        
+    except Exception as e:
+        yield f"data: {json.dumps({'error': str(e)})}\n\n"
 
 @router.get("/models", response_model=ModelListResponse)
 async def list_models():

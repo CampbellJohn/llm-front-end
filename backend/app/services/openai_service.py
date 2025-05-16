@@ -1,7 +1,17 @@
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, AsyncGenerator
 from openai import AsyncOpenAI
 from app.api.v1.models.openai_models import Message
 from app.core.config import settings
+
+# Global client instance
+_client = None
+
+def get_openai_client() -> AsyncOpenAI:
+    """Get or create the OpenAI client."""
+    global _client
+    if _client is None:
+        _client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+    return _client
 
 async def get_openai_response(
     messages: List[Message],
@@ -12,39 +22,24 @@ async def get_openai_response(
 ) -> Dict[str, Any]:
     """
     Get a response from the OpenAI API.
+    For streaming responses, this just returns an empty response as the streaming
+    is handled by the route handler directly.
     """
-    client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+    client = get_openai_client()
     
     # Convert our internal message format to OpenAI's format
-    openai_messages = []
-    
-    for msg in messages:
-        openai_messages.append({
-            "role": msg.role,
-            "content": msg.content
-        })
+    openai_messages = [{"role": msg.role, "content": msg.content} for msg in messages]
     
     try:
         if stream:
-            # Handle streaming response
-            response_content = ""
-            response_stream = await client.chat.completions.create(
-                model=model,
-                messages=openai_messages,
-                max_tokens=max_tokens,
-                temperature=temperature,
-                stream=True
-            )
-            
-            async for chunk in response_stream:
-                if chunk.choices[0].delta.content:
-                    response_content += chunk.choices[0].delta.content
-                    # In a real app, you would yield this to the client
-            
-            # OpenAI streaming doesn't return token usage, so we need to estimate
-            usage = {
-                "prompt_tokens": len("".join([m.content for m in messages])) // 4,  # Rough estimate
-                "completion_tokens": len(response_content) // 4  # Rough estimate
+            # For streaming, we'll handle it in the route
+            return {
+                "content": "",
+                "usage": {
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "total_tokens": 0
+                }
             }
         else:
             # Handle normal response
