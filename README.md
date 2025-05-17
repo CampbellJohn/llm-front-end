@@ -2,7 +2,7 @@
 
 A containerized chat application with a React frontend and FastAPI backend, designed as a starting point to create a customized chat interface.
 
-<img src="./llm-front-end-screenshot.png" alt="Screenshot of the application" width="600" />
+<center><img src="./llm-front-end-screenshot.png" alt="Screenshot of the application" width="600" /></center>
 
 ## Features
 
@@ -10,14 +10,6 @@ A containerized chat application with a React frontend and FastAPI backend, desi
 - FastAPI backend
 - Docker containerization for easy deployment
 - Styled with Tailwind CSS
-
-## Tech Stack
-
-- **Frontend**: React 18, Tailwind CSS, React Icons
-- **Backend**: FastAPI, Python 3.13
-- **Containerization**: Docker, Docker Compose
-- **Styling**: Tailwind CSS
-
 
 ## Getting Started
 
