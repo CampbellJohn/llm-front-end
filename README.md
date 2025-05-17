@@ -2,7 +2,7 @@
 
 A containerized chat application with a React frontend and FastAPI backend, designed as a starting point to create a customized chat interface.
 
-![Chat Interface](https://via.placeholder.com/800x500.png?text=Custom+LLM+Front-End)
+<img src="./llm-front-end-screenshot.png" alt="Screenshot of the application" width="600" />
 
 ## Features
 
