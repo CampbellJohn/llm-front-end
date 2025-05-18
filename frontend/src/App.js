@@ -48,7 +48,7 @@ function App() {
   }, [messages, currentConversationId, conversationTitle]);
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen" style={{ backgroundColor: '#f9fefc' }}>
       {/* Sidebar */}
       <Sidebar 
         onSelectConversation={handleSelectConversation} 
@@ -59,9 +59,9 @@ function App() {
       
       {/* Main content */}
       <div className="flex flex-col flex-1 ml-0 md:ml-64">
-        <header className="bg-white shadow z-10">
+        <header className="shadow z-10" style={{ backgroundColor: '#25293c' }}>
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center">
-            <h1 className="text-xl font-semibold text-gray-800">
+            <h1 className="text-xl font-semibold" style={{ color: '#f9fefc' }}>
               {currentConversationId ? conversationTitle : 'New Chat'}
             </h1>
           </div>
@@ -78,8 +78,8 @@ function App() {
           />
         </main>
         
-        <footer className="bg-white border-t border-gray-200 py-4">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-500 text-sm">
+        <footer style={{ backgroundColor: '#25293c', borderTop: '1px solid #6e7288' }} className="py-4">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm" style={{ color: '#f9fefc' }}>
             https://github.com/CampbellJohn/llm-front-end
           </div>
         </footer>

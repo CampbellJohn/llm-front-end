@@ -24,17 +24,17 @@ const ChatInterface = ({ messages, isLoading, isStreaming, error, sendMessage, c
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 h-full flex flex-col">
-      <div className="bg-white rounded-lg shadow-sm flex flex-col flex-grow">
+      <div className="rounded-lg shadow-sm flex flex-col flex-grow" style={{ backgroundColor: '#f9fefc' }}>
         {/* Messages area */}
         <div 
           className="chat-container p-4 overflow-y-auto flex-grow"
           onScroll={handleScroll}
         >
           {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-gray-500">
+            <div className="flex flex-col items-center justify-center h-full" style={{ color: '#25293c' }}>
               <div className="mb-8 text-center">
                 <h2 className="text-2xl font-bold mb-2">Welcome!</h2>
-                <p className="text-gray-600 mb-6">This is a custom, scalable LLM front-end.</p>
+                <p className="mb-6" style={{ color: '#6e7288' }}>This is a custom, scalable LLM front-end.</p>
               </div>
               <div className="w-full max-w-md">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -46,7 +46,12 @@ const ChatInterface = ({ messages, isLoading, isStreaming, error, sendMessage, c
                   ].map((suggestion, i) => (
                     <button
                       key={i}
-                      className="bg-gray-100 hover:bg-gray-200 rounded-lg py-3 px-4 text-left text-sm transition-colors"
+                      style={{ 
+                        backgroundColor: '#e6d7a9', 
+                        color: '#25293c',
+                        transition: 'background-color 0.2s'
+                      }}
+                      className="hover:bg-opacity-80 rounded-lg py-3 px-4 text-left text-sm"
                       onClick={() => sendMessage(suggestion)}
                     >
                       {suggestion}
@@ -65,7 +70,7 @@ const ChatInterface = ({ messages, isLoading, isStreaming, error, sendMessage, c
                 />
               ))}
               {error && (
-                <div className="bg-red-50 text-red-700 p-4 rounded-md my-4">
+                <div style={{ backgroundColor: '#f9b414', color: '#25293c' }} className="p-4 rounded-md my-4">
                   <strong>Error:</strong> {error}
                 </div>
               )}
@@ -75,14 +80,14 @@ const ChatInterface = ({ messages, isLoading, isStreaming, error, sendMessage, c
         </div>
 
         {/* Input area */}
-        <div className="border-t border-gray-200 p-4">
-          <div className="p-4 border-t border-gray-200 bg-white">
+        <div style={{ borderTop: '1px solid #6e7288' }} className="p-4">
+          <div className="p-4" style={{ borderTop: '1px solid #25293c', backgroundColor: '#f9fefc' }}>
             <MessageInput 
               onSend={sendMessage} 
               isSending={isLoading} 
               disabled={isStreaming} 
             />
-            {error && <div className="mt-2 text-red-500 text-sm">{error}</div>}
+            {error && <div className="mt-2 text-sm" style={{ color: '#f9b414' }}>{error}</div>}
           </div>
         </div>
       </div>
