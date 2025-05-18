@@ -14,8 +14,15 @@ const Sidebar = ({ onSelectConversation, currentConversationId, onNewChat, refre
     const handleResize = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
+      
+      // Close sidebar when switching to mobile
       if (mobile && isOpen) {
         setIsOpen(false);
+      }
+      
+      // Open sidebar when switching to desktop
+      if (!mobile && !isOpen) {
+        setIsOpen(true);
       }
     };
 
@@ -103,7 +110,8 @@ const Sidebar = ({ onSelectConversation, currentConversationId, onNewChat, refre
       {isMobile && (
         <button 
           onClick={toggleSidebar}
-          className="fixed top-4 left-4 z-50 p-2 bg-gray-800 text-white rounded-md"
+          className={`fixed ${isOpen ? 'top-4 right-4' : 'top-4 left-4'} z-50 p-2 rounded-md`}
+          style={{ backgroundColor: '#25293c', color: '#f9fefc' }}
         >
           {isOpen ? <FiX size={20} /> : <FiMenu size={20} />}
         </button>
@@ -111,16 +119,18 @@ const Sidebar = ({ onSelectConversation, currentConversationId, onNewChat, refre
 
       {/* Sidebar */}
       <div className={`
-        fixed top-0 left-0 h-full bg-gray-900 text-white transition-all duration-300 ease-in-out z-40
+        fixed top-0 left-0 h-full transition-all duration-300 ease-in-out z-40
         ${isOpen ? 'w-64' : 'w-0'} 
         ${isMobile ? 'shadow-lg' : ''}
-      `}>
-        <div className="flex flex-col h-full">
+        overflow-hidden
+      `} style={{ backgroundColor: '#25293c', color: '#f9fefc' }}>
+        <div className="flex flex-col h-full w-64">
           {/* New chat button */}
           <div className="p-4">
             <button
               onClick={handleNewChat}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-white/10 hover:bg-white/20 rounded-md transition-colors"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-md transition-colors"
+              style={{ backgroundColor: '#f9b414', color: '#25293c' }}
             >
               <FiPlus size={16} />
               <span>New chat</span>
@@ -130,11 +140,11 @@ const Sidebar = ({ onSelectConversation, currentConversationId, onNewChat, refre
           {/* Conversations list */}
           <div className="flex-grow overflow-y-auto">
             {loading ? (
-              <div className="p-4 text-gray-400 text-center">Loading...</div>
+              <div className="p-4 text-center" style={{ color: '#f9b414' }}>Loading...</div>
             ) : error ? (
-              <div className="p-4 text-red-400 text-center">{error}</div>
+              <div className="p-4 text-center" style={{ color: '#f9b414' }}>{error}</div>
             ) : conversations.length === 0 ? (
-              <div className="p-4 text-gray-400 text-center">No conversations yet</div>
+              <div className="p-4 text-center" style={{ color: '#f9b414' }}>No conversations yet</div>
             ) : (
               <ul className="space-y-1 px-2">
                 {conversations
@@ -155,8 +165,12 @@ const Sidebar = ({ onSelectConversation, currentConversationId, onNewChat, refre
                     onClick={() => onSelectConversation(conversation.id)}
                     className={`
                       flex items-center justify-between p-3 rounded-md cursor-pointer group
-                      ${currentConversationId === conversation.id ? 'bg-white/20' : 'hover:bg-white/10'}
                     `}
+                    style={{
+                      backgroundColor: currentConversationId === conversation.id ? '#e6d7a9' : 'transparent',
+                      color: currentConversationId === conversation.id ? '#25293c' : '#f9fefc',
+                      transition: 'background-color 0.2s'
+                    }}
                   >
                     <div className="flex items-center gap-2 truncate">
                       <FiMessageSquare size={16} />
@@ -164,7 +178,8 @@ const Sidebar = ({ onSelectConversation, currentConversationId, onNewChat, refre
                     </div>
                     <button
                       onClick={(e) => handleDeleteConversation(e, conversation.id)}
-                      className="opacity-0 group-hover:opacity-100 hover:text-red-400"
+                      className="opacity-0 group-hover:opacity-100"
+                      style={{ color: currentConversationId === conversation.id ? '#25293c' : '#f9fefc', transition: 'color 0.2s' }}
                       aria-label="Delete conversation"
                     >
                       <FiTrash2 size={16} />
@@ -176,7 +191,7 @@ const Sidebar = ({ onSelectConversation, currentConversationId, onNewChat, refre
           </div>
 
           {/* Footer */}
-          <div className="p-4 border-t border-white/20 text-xs text-gray-400">
+          <div className="p-4 text-xs" style={{ borderTop: '1px solid #6e7288', color: '#f9b414' }}>
             <p>LLM Chat App</p>
           </div>
         </div>

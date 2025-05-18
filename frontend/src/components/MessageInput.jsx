@@ -38,11 +38,16 @@ const MessageInput = ({ onSend, isSending = false, disabled = false }) => {
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={isInputDisabled ? 'Please wait for the response...' : 'Type your message...'}
-            className={`w-full p-3 pr-12 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              isInputDisabled ? 'bg-gray-100 border-gray-200 cursor-not-allowed' : 'border-gray-300'
+            className={`w-full p-3 pr-12 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:border-transparent ${
+              isInputDisabled ? 'cursor-not-allowed' : ''
             }`}
             rows="1"
-            style={{ minHeight: '44px' }}
+            style={{ 
+              minHeight: '44px', 
+              backgroundColor: isInputDisabled ? '#6e7288' : '#f9fefc',
+              borderColor: isInputDisabled ? '#25293c' : '#6e7288',
+              color: isInputDisabled ? '#f9fefc' : '#25293c'
+            }}
             disabled={isInputDisabled}
           />
         </div>
@@ -51,9 +56,14 @@ const MessageInput = ({ onSend, isSending = false, disabled = false }) => {
           disabled={!message.trim() || isInputDisabled}
           className={`px-4 py-2 h-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${
             isInputDisabled
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500'
+              ? 'cursor-not-allowed'
+              : ''
           }`}
+          style={{
+            backgroundColor: isInputDisabled ? '#6e7288' : '#f9b414',
+            color: isInputDisabled ? '#f9fefc' : '#25293c',
+            borderColor: '#25293c'
+          }}
         >
           {isSending ? 'Sending...' : 'Send'}
         </button>

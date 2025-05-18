@@ -34,7 +34,7 @@ const ChatMessage = ({ message, isLastMessage }) => {
       id={isLastMessage ? 'last-message' : undefined}
     >
       <div className={`message-container ${isUser ? 'user-message' : 'assistant-message'}`}>
-        <div className="text-sm font-medium text-gray-500 mb-1">
+        <div className="text-sm font-medium mb-1" style={{ color: isUser ? '#25293c' : '#f9fefc' }}>
           {isUser ? 'You' : 'Assistant'}
         </div>
         <div className="prose max-w-none">
