@@ -80,8 +80,8 @@ const ChatInterface = ({ messages, isLoading, isStreaming, error, sendMessage, c
         </div>
 
         {/* Input area */}
-        <div style={{ borderTop: '1px solid #6e7288' }} className="p-4">
-          <div className="p-4" style={{ borderTop: '1px solid #25293c', backgroundColor: '#f9fefc' }}>
+        <div className="p-4">
+          <div className="p-4" style={{ backgroundColor: '#f9fefc', borderTop: '1px solid #6e7288' }}>
             <MessageInput 
               onSend={sendMessage} 
               isSending={isLoading} 

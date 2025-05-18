@@ -45,7 +45,7 @@ const MessageInput = ({ onSend, isSending = false, disabled = false }) => {
             style={{ 
               minHeight: '44px', 
               backgroundColor: isInputDisabled ? '#6e7288' : '#f9fefc',
-              borderColor: isInputDisabled ? '#25293c' : '#f9b414',
+              borderColor: isInputDisabled ? '#25293c' : '#6e7288',
               color: isInputDisabled ? '#f9fefc' : '#25293c'
             }}
             disabled={isInputDisabled}
