@@ -56,10 +56,18 @@ export const deleteConversation = async (id) => {
 
 export const updateConversation = async (id, updates) => {
   try {
+    console.log(`Updating conversation ${id} with:`, updates);
     const response = await api.put(`/conversations/${id}`, updates);
+    console.log(`Update response for conversation ${id}:`, response.data);
     return response.data;
   } catch (error) {
     console.error(`Error updating conversation ${id}:`, error);
+    // Log more details about the error
+    if (error.response) {
+      console.error(`Server responded with status ${error.response.status}:`, error.response.data);
+    } else if (error.request) {
+      console.error('No response received from server');
+    }
     throw error;
   }
 };

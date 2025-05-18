@@ -41,6 +41,8 @@ export const useChat = () => {
         setError('Failed to create new conversation');
         return; // Don't proceed if we couldn't create a conversation
       }
+    } else {
+      console.log(`Appending message to existing conversation: ${currentConversationId}`);
     }
     
     setMessages(prev => [...prev, userMessage]);
@@ -91,17 +93,26 @@ export const useChat = () => {
   useEffect(() => {
     // Only update if we have a current conversation and messages
     if (currentConversationId && messages.length > 0) {
+      console.log(`Saving ${messages.length} messages to conversation ${currentConversationId}`);
+      
       // Debounce the update to avoid too many API calls
       const timeoutId = setTimeout(() => {
         updateConversation(currentConversationId, { messages })
           .then(updatedConversation => {
+            console.log(`Successfully updated conversation ${currentConversationId}:`, updatedConversation.id);
+            
+            // Verify the returned conversation ID matches what we expect
+            if (updatedConversation.id !== currentConversationId) {
+              console.warn(`Warning: Updated conversation ID (${updatedConversation.id}) doesn't match current ID (${currentConversationId})`);
+            }
+            
             // Update the conversation title if it changed
             if (updatedConversation.title !== conversationTitle) {
               setConversationTitle(updatedConversation.title);
             }
           })
           .catch(err => {
-            console.error('Error saving messages to conversation:', err);
+            console.error(`Error saving messages to conversation ${currentConversationId}:`, err);
           });
       }, 1000); // Wait 1 second after messages stop changing
       

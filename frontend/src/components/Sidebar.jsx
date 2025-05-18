@@ -28,6 +28,18 @@ const Sidebar = ({ onSelectConversation, currentConversationId, onNewChat }) => 
     try {
       setLoading(true);
       const data = await fetchConversations();
+      
+      // Log the conversations we're receiving
+      console.log(`Fetched ${data.length} conversations:`, data.map(c => ({ id: c.id, title: c.title })));
+      
+      // Check for potential duplicates
+      const ids = data.map(c => c.id);
+      const uniqueIds = [...new Set(ids)];
+      if (ids.length !== uniqueIds.length) {
+        console.warn('Warning: Duplicate conversation IDs detected in response', 
+          ids.filter((id, index) => ids.indexOf(id) !== index));
+      }
+      
       setConversations(data);
       setError(null);
     } catch (err) {
@@ -38,17 +50,9 @@ const Sidebar = ({ onSelectConversation, currentConversationId, onNewChat }) => 
     }
   };
 
-  // Load conversations initially and set up periodic refresh
+  // Load conversations initially
   useEffect(() => {
     loadConversations();
-    
-    // Refresh conversations every 5 seconds
-    const intervalId = setInterval(() => {
-      loadConversations();
-    }, 5000);
-    
-    // Clean up interval on component unmount
-    return () => clearInterval(intervalId);
   }, []);
   
   // Refresh conversations when currentConversationId changes
@@ -59,9 +63,16 @@ const Sidebar = ({ onSelectConversation, currentConversationId, onNewChat }) => 
   // Create new conversation
   const handleNewChat = async () => {
     try {
+      // Step A: Create a new conversation
       const newTitle = `New Chat ${new Date().toLocaleString()}`;
+      
+      // Step B: Add it to the database
       const newConversation = await createConversation(newTitle);
-      setConversations(prev => [newConversation, ...prev]);
+      
+      // Step C: Fetch conversations
+      await loadConversations();
+      
+      // Step D: Select the new conversation
       onSelectConversation(newConversation.id);
       onNewChat();
     } catch (err) {
