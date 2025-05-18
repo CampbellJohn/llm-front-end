@@ -11,6 +11,10 @@ uvicorn==0.34.2
 openai==1.78.0
 httpx==0.28.0
 
+# Database Libraries
+motor==3.3.2
+pymongo==4.6.2
+
 # Uncomment as needed
 #python-jose==3.4.0
 #passlib==1.7.4

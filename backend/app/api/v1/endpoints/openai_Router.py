@@ -3,6 +3,8 @@ from fastapi.responses import StreamingResponse
 from app.api.v1.models.openai_models import ChatRequest, ChatResponse, ModelListResponse, ModelInfo, Message
 from app.core.config import settings
 from app.services.openai_service import get_openai_response, get_openai_client
+from app.services.conversation_service import create_conversation
+from app.api.v1.models.conversation_models import ConversationCreate
 from typing import List, Dict, Any, AsyncGenerator
 from pydantic import BaseModel
 import json
@@ -57,6 +59,27 @@ async def chat(request: ChatRequest):
         )
     else:
         response = await get_llm_response(request)
+        
+        # Save conversation to MongoDB if there are messages
+        if request.messages and len(request.messages) > 0:
+            # Generate a title from the first user message
+            first_user_message = next((m for m in request.messages if m.role == "user"), None)
+            title = first_user_message.content[:50] + "..." if first_user_message else "New conversation"
+            
+            # Create conversation with all messages plus the assistant's response
+            all_messages = list(request.messages)
+            all_messages.append(response.message)
+            
+            conversation = ConversationCreate(
+                title=title,
+                messages=all_messages,
+                model=response.model,
+                provider=response.provider
+            )
+            
+            # Save to database
+            await create_conversation(conversation)
+        
         return response
 
 async def stream_llm_response(request: ChatRequest) -> AsyncGenerator[str, None]:
@@ -80,12 +103,37 @@ async def stream_llm_response(request: ChatRequest) -> AsyncGenerator[str, None]
             stream=True
         )
         
+        # Collect the full response content
+        full_content = ""
+        
         async for chunk in response:
             if chunk.choices and chunk.choices[0].delta.content:
+                content = chunk.choices[0].delta.content
+                full_content += content
                 yield f"data: {json.dumps(chunk.dict())}\n\n"
         
         # Send a done signal
         yield "data: [DONE]\n\n"
+        
+        # Save conversation to MongoDB if there are messages
+        if request.messages and len(request.messages) > 0:
+            # Generate a title from the first user message
+            first_user_message = next((m for m in request.messages if m.role == "user"), None)
+            title = first_user_message.content[:50] + "..." if first_user_message else "New conversation"
+            
+            # Create conversation with all messages plus the assistant's response
+            all_messages = list(request.messages)
+            all_messages.append(Message(role="assistant", content=full_content))
+            
+            conversation = ConversationCreate(
+                title=title,
+                messages=all_messages,
+                model=model,
+                provider=provider
+            )
+            
+            # Save to database
+            await create_conversation(conversation)
         
     except Exception as e:
         yield f"data: {json.dumps({'error': str(e)})}\n\n"
