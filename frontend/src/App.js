@@ -61,7 +61,7 @@ function App() {
       <div className="flex flex-col flex-1 ml-0 md:ml-64">
         <header className="shadow z-10" style={{ backgroundColor: '#25293c' }}>
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center">
-            <h1 className="text-xl font-semibold" style={{ color: '#f9fefc' }}>
+            <h1 className="text-xl font-semibold pl-10 md:pl-0" style={{ color: '#f9fefc' }}>
               {currentConversationId ? conversationTitle : 'New Chat'}
             </h1>
           </div>

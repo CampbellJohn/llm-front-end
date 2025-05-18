@@ -14,8 +14,15 @@ const Sidebar = ({ onSelectConversation, currentConversationId, onNewChat, refre
     const handleResize = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
+      
+      // Close sidebar when switching to mobile
       if (mobile && isOpen) {
         setIsOpen(false);
+      }
+      
+      // Open sidebar when switching to desktop
+      if (!mobile && !isOpen) {
+        setIsOpen(true);
       }
     };
 
@@ -103,7 +110,7 @@ const Sidebar = ({ onSelectConversation, currentConversationId, onNewChat, refre
       {isMobile && (
         <button 
           onClick={toggleSidebar}
-          className="fixed top-4 left-4 z-50 p-2 rounded-md"
+          className={`fixed ${isOpen ? 'top-4 right-4' : 'top-4 left-4'} z-50 p-2 rounded-md`}
           style={{ backgroundColor: '#25293c', color: '#f9fefc' }}
         >
           {isOpen ? <FiX size={20} /> : <FiMenu size={20} />}
@@ -115,8 +122,9 @@ const Sidebar = ({ onSelectConversation, currentConversationId, onNewChat, refre
         fixed top-0 left-0 h-full transition-all duration-300 ease-in-out z-40
         ${isOpen ? 'w-64' : 'w-0'} 
         ${isMobile ? 'shadow-lg' : ''}
+        overflow-hidden
       `} style={{ backgroundColor: '#25293c', color: '#f9fefc' }}>
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full w-64">
           {/* New chat button */}
           <div className="p-4">
             <button
