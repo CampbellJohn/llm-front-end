@@ -60,9 +60,12 @@ async def create_conversation(conversation: ConversationCreate) -> Conversation:
 async def get_conversation(conversation_id: str) -> Optional[Conversation]:
     """Get a conversation by ID"""
     try:
+        print(f"Looking for conversation with ID: {conversation_id}")
         conversation = await get_collection().find_one({"id": conversation_id})
         if conversation:
+            print(f"Found conversation: {conversation['id']}")
             return Conversation(**conversation)
+        print(f"Conversation with ID {conversation_id} not found")
         return None
     except Exception as e:
         logging.error(f"Error getting conversation: {str(e)}")
@@ -82,8 +85,10 @@ async def update_conversation(conversation_id: str, conversation_update: Convers
     """Update a conversation"""
     try:
         # Get the current conversation
+        print(f"Attempting to update conversation with ID: {conversation_id}")
         current = await get_conversation(conversation_id)
         if not current:
+            print(f"Cannot update - conversation with ID {conversation_id} not found")
             return None
         
         # Update only provided fields
@@ -91,11 +96,15 @@ async def update_conversation(conversation_id: str, conversation_update: Convers
         update_data = {k: v for k, v in update_data.items() if v is not None}
         update_data["updated_at"] = datetime.utcnow()
         
+        print(f"Updating conversation {conversation_id} with data: {json.dumps(update_data, default=str)}")
+        
         # Update in database
         result = await get_collection().update_one(
             {"id": conversation_id},
             {"$set": update_data}
         )
+        
+        print(f"Update result: matched={result.matched_count}, modified={result.modified_count}")
         
         if result.modified_count:
             return await get_conversation(conversation_id)

@@ -54,6 +54,7 @@ function App() {
         onSelectConversation={handleSelectConversation} 
         currentConversationId={currentConversationId}
         onNewChat={handleNewChat}
+        refreshTrigger={currentConversationId} // This will trigger a refresh when a new conversation is created
       />
       
       {/* Main content */}

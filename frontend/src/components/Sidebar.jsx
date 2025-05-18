@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FiPlus, FiTrash2, FiMessageSquare, FiMenu, FiX } from 'react-icons/fi';
-import { fetchConversations, createConversation, deleteConversation } from '../services/api';
+import { fetchConversations, deleteConversation } from '../services/api';
 
-const Sidebar = ({ onSelectConversation, currentConversationId, onNewChat }) => {
+const Sidebar = ({ onSelectConversation, currentConversationId, onNewChat, refreshTrigger }) => {
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -55,28 +55,25 @@ const Sidebar = ({ onSelectConversation, currentConversationId, onNewChat }) => 
     loadConversations();
   }, []);
   
-  // Refresh conversations when currentConversationId changes
+  // Refresh conversations when refreshTrigger changes (which happens when a new conversation is created)
   useEffect(() => {
-    loadConversations();
-  }, [currentConversationId]);
+    if (refreshTrigger) {
+      console.log('Refreshing conversations due to refreshTrigger change:', refreshTrigger);
+      loadConversations();
+    }
+  }, [refreshTrigger]);
 
   // Create new conversation
   const handleNewChat = async () => {
     try {
-      // Step A: Create a new conversation
-      const newTitle = `New Chat ${new Date().toLocaleString()}`;
-      
-      // Step B: Add it to the database
-      const newConversation = await createConversation(newTitle);
-      
-      // Step C: Fetch conversations
-      await loadConversations();
-      
-      // Step D: Select the new conversation
-      onSelectConversation(newConversation.id);
+      // Just call onNewChat to clear the current conversation in useChat
+      // This will allow useChat to create a new conversation when a message is sent
       onNewChat();
+      
+      // Refresh the conversation list to show any changes
+      await loadConversations();
     } catch (err) {
-      console.error('Failed to create new conversation:', err);
+      console.error('Failed to handle new chat:', err);
       setError('Failed to create new conversation');
     }
   };
@@ -140,9 +137,21 @@ const Sidebar = ({ onSelectConversation, currentConversationId, onNewChat }) => 
               <div className="p-4 text-gray-400 text-center">No conversations yet</div>
             ) : (
               <ul className="space-y-1 px-2">
-                {conversations.map((conversation) => (
+                {conversations
+                  .sort((a, b) => {
+                    // First, put the current conversation at the top
+                    if (a.id === currentConversationId) return -1;
+                    if (b.id === currentConversationId) return 1;
+                    
+                    // Then sort by updated_at (most recent first)
+                    const dateA = new Date(a.updated_at);
+                    const dateB = new Date(b.updated_at);
+                    return dateB - dateA;
+                  })
+                  .map((conversation) => (
                   <li 
                     key={conversation.id}
+                    data-conversation-id={conversation.id}
                     onClick={() => onSelectConversation(conversation.id)}
                     className={`
                       flex items-center justify-between p-3 rounded-md cursor-pointer group

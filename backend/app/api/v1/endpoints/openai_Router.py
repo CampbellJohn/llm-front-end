@@ -60,25 +60,8 @@ async def chat(request: ChatRequest):
     else:
         response = await get_llm_response(request)
         
-        # Save conversation to MongoDB if there are messages
-        if request.messages and len(request.messages) > 0:
-            # Generate a title from the first user message
-            first_user_message = next((m for m in request.messages if m.role == "user"), None)
-            title = first_user_message.content[:50] + "..." if first_user_message else "New conversation"
-            
-            # Create conversation with all messages plus the assistant's response
-            all_messages = list(request.messages)
-            all_messages.append(response.message)
-            
-            conversation = ConversationCreate(
-                title=title,
-                messages=all_messages,
-                model=response.model,
-                provider=response.provider
-            )
-            
-            # Save to database
-            await create_conversation(conversation)
+        # We no longer automatically create a conversation here
+        # The frontend is responsible for managing conversations
         
         return response
 
@@ -115,25 +98,8 @@ async def stream_llm_response(request: ChatRequest) -> AsyncGenerator[str, None]
         # Send a done signal
         yield "data: [DONE]\n\n"
         
-        # Save conversation to MongoDB if there are messages
-        if request.messages and len(request.messages) > 0:
-            # Generate a title from the first user message
-            first_user_message = next((m for m in request.messages if m.role == "user"), None)
-            title = first_user_message.content[:50] + "..." if first_user_message else "New conversation"
-            
-            # Create conversation with all messages plus the assistant's response
-            all_messages = list(request.messages)
-            all_messages.append(Message(role="assistant", content=full_content))
-            
-            conversation = ConversationCreate(
-                title=title,
-                messages=all_messages,
-                model=model,
-                provider=provider
-            )
-            
-            # Save to database
-            await create_conversation(conversation)
+        # We no longer automatically create a conversation here
+        # The frontend is responsible for managing conversations
         
     except Exception as e:
         yield f"data: {json.dumps({'error': str(e)})}\n\n"
