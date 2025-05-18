@@ -3,6 +3,8 @@ from fastapi.responses import StreamingResponse
 from app.api.v1.models.openai_models import ChatRequest, ChatResponse, ModelListResponse, ModelInfo, Message
 from app.core.config import settings
 from app.services.openai_service import get_openai_response, get_openai_client
+from app.services.conversation_service import create_conversation
+from app.api.v1.models.conversation_models import ConversationCreate
 from typing import List, Dict, Any, AsyncGenerator
 from pydantic import BaseModel
 import json
@@ -57,6 +59,10 @@ async def chat(request: ChatRequest):
         )
     else:
         response = await get_llm_response(request)
+        
+        # We no longer automatically create a conversation here
+        # The frontend is responsible for managing conversations
+        
         return response
 
 async def stream_llm_response(request: ChatRequest) -> AsyncGenerator[str, None]:
@@ -80,12 +86,20 @@ async def stream_llm_response(request: ChatRequest) -> AsyncGenerator[str, None]
             stream=True
         )
         
+        # Collect the full response content
+        full_content = ""
+        
         async for chunk in response:
             if chunk.choices and chunk.choices[0].delta.content:
+                content = chunk.choices[0].delta.content
+                full_content += content
                 yield f"data: {json.dumps(chunk.dict())}\n\n"
         
         # Send a done signal
         yield "data: [DONE]\n\n"
+        
+        # We no longer automatically create a conversation here
+        # The frontend is responsible for managing conversations
         
     except Exception as e:
         yield f"data: {json.dumps({'error': str(e)})}\n\n"
