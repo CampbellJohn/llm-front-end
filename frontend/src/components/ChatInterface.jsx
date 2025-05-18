@@ -1,11 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useChat } from '../hooks/useChat';
 import ChatMessage from './ChatMessage';
 import MessageInput from './MessageInput';
-import { FiRefreshCw } from 'react-icons/fi';
 
-const ChatInterface = () => {
-  const { messages, isLoading, isStreaming, error, sendMessage, clearMessages } = useChat();
+const ChatInterface = ({ messages, isLoading, isStreaming, error, sendMessage, clearMessages }) => {
   const messagesEndRef = useRef(null);
   const [autoScroll, setAutoScroll] = useState(true);
 
@@ -79,17 +76,6 @@ const ChatInterface = () => {
 
         {/* Input area */}
         <div className="border-t border-gray-200 p-4">
-          <div className="flex items-center justify-end mb-2">
-            {messages.length > 0 && (
-              <button
-                onClick={clearMessages}
-                className="flex items-center text-sm text-gray-500 hover:text-gray-700"
-              >
-                <FiRefreshCw className="mr-1" size={14} />
-                New Chat
-              </button>
-            )}
-          </div>
           <div className="p-4 border-t border-gray-200 bg-white">
             <MessageInput 
               onSend={sendMessage} 

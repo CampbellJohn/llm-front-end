@@ -1,11 +1,13 @@
-import { useState, useCallback } from 'react';
-import { sendChatRequest } from '../services/api';
+import { useState, useCallback, useEffect } from 'react';
+import { sendChatRequest, fetchConversation, updateConversation, createConversation } from '../services/api';
 
 export const useChat = () => {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [currentConversationId, setCurrentConversationId] = useState(null);
+  const [conversationTitle, setConversationTitle] = useState('New Chat');
 
   const updateLastMessage = useCallback((content) => {
     setMessages(prev => {
@@ -24,6 +26,22 @@ export const useChat = () => {
 
   const sendMessage = async (content) => {
     const userMessage = { role: 'user', content };
+    
+    // Create a new conversation if we don't have one yet
+    if (!currentConversationId) {
+      try {
+        // Create a title from the first message
+        const title = content.length > 30 ? `${content.substring(0, 30)}...` : content;
+        const newConversation = await createConversation(title);
+        setCurrentConversationId(newConversation.id);
+        setConversationTitle(newConversation.title);
+        console.log(`Created new conversation: ${newConversation.id}`);
+      } catch (err) {
+        console.error('Failed to create new conversation:', err);
+        setError('Failed to create new conversation');
+        return; // Don't proceed if we couldn't create a conversation
+      }
+    }
     
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
@@ -65,6 +83,47 @@ export const useChat = () => {
   const clearMessages = () => {
     setMessages([]);
     setError(null);
+    setCurrentConversationId(null);
+    setConversationTitle('New Chat');
+  };
+  
+  // Save messages to the conversation when they change
+  useEffect(() => {
+    // Only update if we have a current conversation and messages
+    if (currentConversationId && messages.length > 0) {
+      // Debounce the update to avoid too many API calls
+      const timeoutId = setTimeout(() => {
+        updateConversation(currentConversationId, { messages })
+          .then(updatedConversation => {
+            // Update the conversation title if it changed
+            if (updatedConversation.title !== conversationTitle) {
+              setConversationTitle(updatedConversation.title);
+            }
+          })
+          .catch(err => {
+            console.error('Error saving messages to conversation:', err);
+          });
+      }, 1000); // Wait 1 second after messages stop changing
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [messages, currentConversationId, conversationTitle]);
+
+  const loadConversation = async (conversationId) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const conversation = await fetchConversation(conversationId);
+      setMessages(conversation.messages || []);
+      setConversationTitle(conversation.title);
+      setCurrentConversationId(conversationId);
+    } catch (err) {
+      console.error('Error loading conversation:', err);
+      setError('Failed to load conversation');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return {
@@ -74,6 +133,10 @@ export const useChat = () => {
     error,
     sendMessage,
     clearMessages,
+    loadConversation,
+    currentConversationId,
+    conversationTitle,
+    setCurrentConversationId
   };
 };
 
