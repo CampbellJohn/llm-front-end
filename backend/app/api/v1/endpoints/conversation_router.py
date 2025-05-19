@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, status, Query, Request
-from typing import List, Optional
+from typing import List
 import logging
 import traceback
-from app.api.v1.models.conversation_models import Conversation, ConversationCreate, ConversationUpdate, ConversationResponse
+from app.api.v1.models.conversation_models import ConversationCreate, ConversationUpdate, ConversationResponse
 from app.services.conversation_service import (
     create_conversation, 
     get_conversation, 
