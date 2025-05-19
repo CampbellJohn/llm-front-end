@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
     
     # Default model settings
-    DEFAULT_MODEL: str = "gpt-3.5-turbo"
+    DEFAULT_MODEL: str = "gpt-4o-mini"
     DEFAULT_PROVIDER: str = "openai"
     
     # API configuration

@@ -113,7 +113,7 @@ export const sendChatRequest = async (messages, onChunk) => {
         buffer = buffer.slice(boundary + 2);
 
         if (line.startsWith('data: ')) {
-          const data = line.slice(6); // Remove 'data: ' prefix
+          const data = line.slice(6);
           
           // Skip empty lines and the [DONE] message
           if (!data || data === '[DONE]') continue;

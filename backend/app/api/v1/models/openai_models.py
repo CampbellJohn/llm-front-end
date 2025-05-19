@@ -8,8 +8,8 @@ class Message(BaseModel):
 class ChatRequest(BaseModel):
     messages: List[Message]
     model: Optional[str] = None
-    provider: Optional[Literal["anthropic", "openai"]] = None
-    max_tokens: Optional[int] = 4000
+    provider: Optional[Literal["openai"]] = None
+    max_tokens: Optional[int] = 8000
     temperature: Optional[float] = 0.7
     stream: Optional[bool] = False
 
