@@ -3,45 +3,47 @@
     "version": "0.1.0",
     "private": true,
     "dependencies": {
-      "@testing-library/jest-dom": "^5.16.5",
-      "@testing-library/react": "^13.4.0",
-      "@testing-library/user-event": "^13.5.0",
-      "axios": "^1.4.0",
-      "react": "^18.2.0",
-      "react-dom": "^18.2.0",
-      "react-icons": "^4.10.1",
-      "react-markdown": "^8.0.7",
-      "react-scripts": "5.0.1",
-      "react-syntax-highlighter": "^15.5.0",
-      "tailwindcss": "^3.3.3",
-      "web-vitals": "^2.1.4"
+        "axios": "^1.4.0",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "react-icons": "^4.10.1",
+        "react-markdown": "^8.0.7",
+        "react-scripts": "5.0.1",
+        "react-syntax-highlighter": "^15.5.0",
+        "tailwindcss": "^3.3.3",
+        "web-vitals": "^2.1.4"
     },
     "scripts": {
-      "start": "react-scripts start",
-      "build": "react-scripts build",
-      "test": "react-scripts test",
-      "eject": "react-scripts eject"
+        "start": "react-scripts start",
+        "build": "react-scripts build",
+        "test": "jest --config=jest.config.cjs",
+        "eject": "react-scripts eject"
     },
     "eslintConfig": {
-      "extends": [
-        "react-app",
-        "react-app/jest"
-      ]
+        "extends": [
+            "react-app",
+            "react-app/jest"
+        ]
     },
     "browserslist": {
-      "production": [
-        ">0.2%",
-        "not dead",
-        "not op_mini all"
-      ],
-      "development": [
-        "last 1 chrome version",
-        "last 1 firefox version",
-        "last 1 safari version"
-      ]
+        "production": [
+            ">0.2%",
+            "not dead",
+            "not op_mini all"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ]
     },
     "devDependencies": {
-      "autoprefixer": "^10.4.14",
-      "postcss": "^8.4.26"
+        "@tanstack/react-query": "^5.77.0",
+        "@testing-library/jest-dom": "^6.6.3",
+        "@testing-library/react": "^16.3.0",
+        "@testing-library/user-event": "^14.6.1",
+        "autoprefixer": "^10.4.14",
+        "babel-plugin-transform-import-meta": "^2.3.2",
+        "postcss": "^8.4.26"
     }
-  }
+}
