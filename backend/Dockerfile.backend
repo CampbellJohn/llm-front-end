@@ -1,26 +1,49 @@
 # Base image
 FROM python:3.13-slim-bookworm AS base
 
-# Builder stage for installing dependencies
-FROM base AS builder
+# Builder stage for production dependencies
+FROM base AS prod-builder
 RUN mkdir /install
 WORKDIR /install
-COPY requirements.txt /requirements.txt
+COPY requirements.txt /install/
 # Use pip wheel to build packages
 RUN pip install --no-cache-dir wheel \
-    && pip wheel --no-cache-dir --wheel-dir=/install/wheels -r /requirements.txt
+    && pip wheel --no-cache-dir --wheel-dir=/install/wheels -r /install/requirements.txt
 
-# Final stage
-FROM base
+# Builder stage for test dependencies
+FROM base AS test-builder
+RUN mkdir /install
+WORKDIR /install
+COPY requirements.txt requirements-test.txt /install/
+# Use pip wheel to build packages (including test dependencies)
+RUN pip install --no-cache-dir wheel \
+    && pip wheel --no-cache-dir --wheel-dir=/install/wheels -r /install/requirements-test.txt
+
+# Testing stage
+FROM base AS test
 WORKDIR /app
-
-# Copy only the built wheels and install them
-COPY --from=builder /install/wheels /wheels
+# Copy wheels from test-builder
+COPY --from=test-builder /install/wheels /wheels
+# Install all dependencies including test dependencies
 RUN pip install --no-cache-dir --no-index --find-links=/wheels/ /wheels/* \
     && rm -rf /wheels
+# Copy application code and tests
+COPY ./app /app
+COPY ./tests /app/tests
+COPY ./pytest.ini /app/pytest.ini
+# Run tests
+RUN pytest
 
+# Final production stage
+FROM base
+WORKDIR /app
+# Copy only the production wheels from prod-builder
+COPY --from=prod-builder /install/wheels /wheels
+# Install only production dependencies
+RUN pip install --no-cache-dir --no-index --find-links=/wheels/ /wheels/* \
+    && rm -rf /wheels
 # Copy application code
 COPY ./app /app
 
 # Run the application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

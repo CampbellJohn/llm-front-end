@@ -16,7 +16,7 @@ async def connect_to_mongo():
         print(f"Connecting to MongoDB at {settings.MONGODB_URL}")
         
         # Connect with retry logic
-        for attempt in range(10):
+        for attempt in range(5):
             try:
                 # Parse connection options from URL
                 MongoDB.client = AsyncIOMotorClient(
@@ -45,7 +45,7 @@ async def connect_to_mongo():
                 return
             except Exception as e:
                 print(f"Connection attempt {attempt+1} failed: {str(e)}")
-                if attempt < 9:
+                if attempt < 4:
                     await asyncio.sleep(5)
                 else:
                     raise

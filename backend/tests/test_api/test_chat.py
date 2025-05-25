@@ -2,16 +2,14 @@
 Tests for the chat API endpoints.
 """
 import pytest
-import json
 from fastapi import status
 from unittest.mock import patch, MagicMock, AsyncMock
 from datetime import datetime
-from app.api.v1.models.openai_models import Message, ChatRequest, ChatResponse
 
 # Test markers
 pytestmark = pytest.mark.asyncio
 
-async def test_chat_endpoint_success(test_client, mock_openai, mock_mongodb):
+async def test_chat_endpoint_success(test_client):
     """Test successful chat completion."""
     # Test data
     request_data = {
@@ -22,21 +20,42 @@ async def test_chat_endpoint_success(test_client, mock_openai, mock_mongodb):
         "stream": False
     }
     
-    # Make request
-    response = test_client.post("/api/chat", json=request_data)
-    
-    # Assertions
-    assert response.status_code == status.HTTP_200_OK
-    data = response.json()
-    assert "message" in data
-    assert isinstance(data["message"], dict)
-    assert data["message"].get("content") == "This is a test response"
-    assert data.get("provider") == "openai"
-    
-    # Test with a conversation ID (even though it's not returned in the response)
-    request_data["conversation_id"] = "test-conversation-id"
-    response = test_client.post("/api/chat", json=request_data)
-    assert response.status_code == status.HTTP_200_OK
+    # Use a single patch for all requests in this test
+    with patch("app.services.openai_service.get_openai_client") as mock_get_client, \
+         patch("openai.AsyncOpenAI") as mock_async_openai:
+        # Create a mock response
+        mock_response = MagicMock()
+        mock_response.choices = [MagicMock()]
+        mock_response.choices[0].message = MagicMock()
+        mock_response.choices[0].message.content = "This is a test response"
+        mock_response.usage = MagicMock()
+        mock_response.usage.total_tokens = 10
+        
+        # Configure the mock client
+        mock_client = MagicMock()
+        mock_client.chat.completions.create = AsyncMock(return_value=mock_response)
+        mock_get_client.return_value = mock_client
+        
+        # Also mock the AsyncOpenAI class that might be used directly
+        mock_async_client = MagicMock()
+        mock_async_client.chat.completions.create = AsyncMock(return_value=mock_response)
+        mock_async_openai.return_value = mock_async_client
+        
+        # Test 1: Basic request without conversation ID
+        response = test_client.post("/api/chat", json=request_data)
+        
+        # Assertions
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert "message" in data
+        assert isinstance(data["message"], dict)
+        assert data["message"].get("content") == "This is a test response"
+        assert data.get("provider") == "openai"
+        
+        # Test 2: With a conversation ID
+        request_data["conversation_id"] = "test-conversation-id"
+        response = test_client.post("/api/chat", json=request_data)
+        assert response.status_code == status.HTTP_200_OK
     
 async def test_chat_endpoint_missing_messages(test_client):
     """Test chat endpoint with missing messages."""
@@ -49,7 +68,7 @@ async def test_chat_endpoint_missing_messages(test_client):
     )
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
-async def test_chat_stream_endpoint(test_client, mock_openai, mock_mongodb):
+async def test_chat_stream_endpoint(test_client):
     """Test the chat streaming endpoint."""
     # Test data
     request_data = {
@@ -128,7 +147,7 @@ async def test_chat_stream_endpoint(test_client, mock_openai, mock_mongodb):
     assert 'test response' in content_str or '"error"' in content_str
 
 
-async def test_get_conversation_endpoint_success(test_client, mock_mongodb):
+async def test_get_conversation_endpoint_success(test_client):
     """Test successful conversation retrieval."""
     # Create a test conversation ID
     conversation_id = "test-conversation-id"
@@ -171,7 +190,7 @@ async def test_get_nonexistent_conversation(test_client):
         # Assertions
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-async def test_list_conversations(test_client, mock_mongodb):
+async def test_list_conversations(test_client):
     """Test listing conversations."""
     # Create mock conversations
     mock_conversations = [

@@ -3,9 +3,7 @@ Tests for the conversations API endpoints.
 """
 import pytest
 from fastapi import status
-from unittest.mock import AsyncMock, MagicMock, patch
-from datetime import datetime
-from app.api.v1.models.conversation_models import ConversationCreate, Message
+from unittest.mock import AsyncMock, MagicMock
 
 # Import the service functions to test
 from app.services.conversation_service import (
@@ -18,7 +16,7 @@ from app.services.conversation_service import (
 )
 
 @pytest.mark.asyncio
-async def test_list_conversations(test_client, mock_mongodb, monkeypatch):
+async def test_list_conversations(test_client, monkeypatch):
     # Sample conversations data
     test_conversations = [
         {"id": "1", "title": "Test 1", "messages": []},
@@ -59,7 +57,7 @@ async def test_list_conversations(test_client, mock_mongodb, monkeypatch):
     assert data[1]["title"] == test_conversations[1]["title"]
 
 @pytest.mark.asyncio
-async def test_get_conversation(test_client, mock_mongodb, monkeypatch):
+async def test_get_conversation(test_client, monkeypatch):
     # Sample conversation data
     test_id = "test_id"
     test_conversation = {"id": test_id, "title": "Test Conversation"}
@@ -93,7 +91,7 @@ async def test_get_conversation(test_client, mock_mongodb, monkeypatch):
     mock_collection.find_one.assert_called_once_with({"id": test_id})
 
 @pytest.mark.asyncio
-async def test_create_conversation(test_client, mock_mongodb, monkeypatch):
+async def test_create_conversation(test_client, monkeypatch):
     # Sample conversation data
     test_conversation = {"title": "New Conversation", "messages": []}
     test_id = "test_id_123"
@@ -136,7 +134,7 @@ async def test_create_conversation(test_client, mock_mongodb, monkeypatch):
     assert insert_data["messages"] == test_conversation["messages"]
 
 @pytest.mark.asyncio
-async def test_update_conversation(test_client, mock_mongodb, monkeypatch):
+async def test_update_conversation(test_client, monkeypatch):
     # Test data
     test_id = "test_id"
     test_conversation = {"id": test_id, "title": "Original Title", "messages": []}
@@ -182,7 +180,7 @@ async def test_update_conversation(test_client, mock_mongodb, monkeypatch):
     assert "$set" in update_args
 
 @pytest.mark.asyncio
-async def test_delete_conversation(test_client, mock_mongodb, monkeypatch):
+async def test_delete_conversation(test_client, monkeypatch):
     # Test data
     test_id = "test_id"
     
@@ -212,7 +210,7 @@ async def test_delete_conversation(test_client, mock_mongodb, monkeypatch):
     mock_collection.delete_one.assert_called_once_with({"id": test_id})
 
 @pytest.mark.asyncio
-async def test_add_message_to_conversation(test_client, mock_mongodb, monkeypatch):
+async def test_add_message_to_conversation(test_client, monkeypatch):
     # Test data
     test_id = "test_id"
     test_message = {

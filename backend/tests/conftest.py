@@ -3,20 +3,17 @@ Pytest configuration and fixtures for testing the backend application.
 """
 import os
 import asyncio
-from typing import AsyncGenerator, Generator, Dict, Any
+from typing import Generator
 from unittest.mock import AsyncMock, MagicMock, patch
-from datetime import datetime
+from datetime import datetime, timezone
 from bson import ObjectId
 
 import pytest
 from fastapi.testclient import TestClient
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pymongo import MongoClient
-from pymongo.errors import CollectionInvalid
 from unittest.mock import AsyncMock, MagicMock
 
-from app.main import app as original_app
 from app.core.config import settings
 from app.api.v1.endpoints.openai_Router import router as openai_router
 from app.api.v1.endpoints.conversation_router import router as conversation_router
@@ -78,13 +75,11 @@ async def test_client(test_app) -> TestClient:
         yield client
 
 
-from unittest.mock import AsyncMock, MagicMock
 from motor.motor_asyncio import AsyncIOMotorCollection, AsyncIOMotorDatabase
-import pytest
-from app.core.database import MongoDB, get_database
+from app.core.database import get_database
 
 @pytest.fixture(scope="function")
-async def mock_mongodb(monkeypatch, sample_conversation):
+async def mock_mongodb(monkeypatch):
     """Create a mock MongoDB client for testing with proper async support."""
     # Create a mock database
     mock_db = MagicMock(spec=AsyncIOMotorDatabase)
@@ -134,8 +129,8 @@ async def mock_mongodb(monkeypatch, sample_conversation):
         doc_id = str(ObjectId())
         document['_id'] = doc_id
         document['id'] = doc_id
-        document['created_at'] = datetime.utcnow()
-        document['updated_at'] = datetime.utcnow()
+        document['created_at'] = datetime.now(timezone.utc)
+        document['updated_at'] = datetime.now(timezone.utc)
         test_conversations[doc_id] = document
         
         mock_result = MagicMock()
@@ -161,7 +156,7 @@ async def mock_mongodb(monkeypatch, sample_conversation):
                     doc[key] = value
             
             # Always update updated_at
-            doc['updated_at'] = datetime.utcnow()
+            doc['updated_at'] = datetime.now(timezone.utc)
         
         mock_result = MagicMock()
         mock_result.matched_count = 1

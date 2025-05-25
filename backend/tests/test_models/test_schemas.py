@@ -4,7 +4,6 @@ Tests for Pydantic models and schemas.
 from datetime import datetime
 
 import pytest
-from pydantic import ValidationError
 
 from app.api.v1.models.openai_models import ChatRequest, ChatResponse, Message
 from app.api.v1.models.conversation_models import Conversation

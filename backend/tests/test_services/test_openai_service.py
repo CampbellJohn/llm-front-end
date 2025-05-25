@@ -2,12 +2,9 @@
 Tests for the OpenAI service.
 """
 import pytest
-import json
-from unittest.mock import patch, MagicMock, AsyncMock, ANY
-from fastapi import HTTPException
-
-from app.api.v1.models.openai_models import Message, ChatRequest
-from app.services.openai_service import get_openai_response, get_openai_client
+from unittest.mock import patch, MagicMock, AsyncMock
+from app.api.v1.models.openai_models import Message
+from app.services.openai_service import get_openai_response
 
 # Test markers
 pytestmark = pytest.mark.asyncio
