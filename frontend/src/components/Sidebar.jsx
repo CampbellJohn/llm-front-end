@@ -88,6 +88,13 @@ const Sidebar = ({ onSelectConversation, currentConversationId, onNewChat, refre
   // Delete conversation
   const handleDeleteConversation = async (e, id) => {
     e.stopPropagation();
+    
+    // Show confirmation dialog
+    const isConfirmed = window.confirm('Are you sure you want to delete this conversation?');
+    if (!isConfirmed) {
+      return; // User cancelled the deletion
+    }
+    
     try {
       await deleteConversation(id);
       setConversations(prev => prev.filter(conv => conv.id !== id));

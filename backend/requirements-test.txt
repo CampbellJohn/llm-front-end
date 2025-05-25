@@ -1,0 +1,9 @@
+# Test dependencies
+-r requirements.txt
+
+# Testing libraries
+pytest==8.3.5
+pytest-asyncio==0.26.0
+pytest-cov==6.1.1
+httpx==0.28.1  # Required for FastAPI TestClient
+mongomock==4.3.0  # MongoDB mock for testing

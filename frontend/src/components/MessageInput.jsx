@@ -17,6 +17,18 @@ const MessageInput = ({ onSend, isSending = false, disabled = false }) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e);
+    } else if (e.key === 'Enter' && e.shiftKey) {
+      // Allow Shift+Enter for new lines
+      const { selectionStart, selectionEnd } = e.target;
+      const newMessage = message.substring(0, selectionStart) + '\n' + message.substring(selectionEnd);
+      setMessage(newMessage);
+      
+      // Move cursor to after the newline
+      setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.selectionStart = textareaRef.current.selectionEnd = selectionStart + 1;
+        }
+      }, 0);
     }
   };
 

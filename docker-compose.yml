@@ -1,6 +1,24 @@
-version: '3.8'
-
 services:
+  backend-test:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.backend
+      target: test
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+      - MONGODB_URL=mongodb://mongodb:27017/llm_chat_db_test
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+    profiles:
+      - test
+    # Explicitly run the tests when the container starts
+    command: pytest -v
+
   backend:
     build:
       context: ./backend
@@ -26,7 +44,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.frontend
     ports:
-      - "3000:3000"
+      - "3000:80"
     volumes:
       - ./frontend:/app
       - /app/node_modules

@@ -14,7 +14,7 @@ A containerized chat application with a React frontend and FastAPI backend, desi
   - Clean, intuitive interface
 
 - **FastAPI Backend**
-  - RESTful API that can be extended
+  - RESTful API ready for extension
   - MongoDB integration for persistent storage
   - Asynchronous request handling
 
@@ -47,12 +47,24 @@ OPENAI_API_KEY=your_openai_api_key_here
 # MongoDB
 MONGODB_URL=mongodb://mongodb:27017/llm_chat_db
 MONGODB_DB_NAME=llm_chat_db
-
-# Frontend (optional, for local development without Docker)
-REACT_APP_API_URL=http://localhost:8000
 ```
 
-### 3. Run with Docker (Recommended)
+### 3. Run Tests (Optional)
+
+Frontend testing happens automatically when the container starts. Backend testing can be run in its own container:
+
+```bash
+docker-compose --profile test build --no-cache backend-test
+docker-compose --profile test run --rm backend-test
+```
+
+This command:
+- Uses the test profile to include the test service
+- Runs the tests in the test environment
+- Automatically removes the test container when done (`--rm` flag)
+- Exits with a non-zero code if tests fail
+
+### 4. Start the Docker containers
 
 ```bash
 docker-compose up --build
@@ -63,7 +75,7 @@ This will start:
 - FastAPI backend
 - React frontend
 
-### 4. Access the application
+### 5. Access the application
 
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8000
