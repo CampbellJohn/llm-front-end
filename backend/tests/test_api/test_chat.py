@@ -2,9 +2,13 @@
 Tests for the chat API endpoints.
 """
 import pytest
+import logging
 from fastapi import status
 from unittest.mock import patch, MagicMock, AsyncMock
 from datetime import datetime
+
+# Set up test logger
+logger = logging.getLogger(__name__)
 
 # Test markers
 pytestmark = pytest.mark.asyncio
@@ -131,9 +135,9 @@ async def test_chat_stream_endpoint(test_client):
     
     # We may get an error or a valid response, let's handle both cases
     if '"error"' in content_str:
-        # If there's an error, print it but don't fail the test
+        # If there's an error, log it but don't fail the test
         # This allows the test to pass even with the current implementation
-        print(f"Streaming test error: {content_str}")
+        logger.warning("Streaming test error", extra={"content": content_str})
         assert True
     else:
         # If no error, check for expected content
