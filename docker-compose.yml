@@ -29,6 +29,7 @@ services:
       - .env
     volumes:
       - ./backend:/app
+      - app_logs:/var/log/app
     environment:
       - PYTHONUNBUFFERED=1
       - PYTHONDONTWRITEBYTECODE=1
@@ -76,3 +77,4 @@ networks:
 
 volumes:
   mongodb_data:
+  app_logs:
