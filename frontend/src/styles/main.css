@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --color-white: #f9fefc;
+  --color-light: #f9fefc;
   --color-dark: #25293c;
   --color-gray: #6e7288;
-  --color-yellow: #f9b414;
-  --color-neutral-yellow: #e6d7a9;
+  --color-callout: #f9b414;
+  --color-neutral-callout: #e6d7a9;
 }
 
 /* Custom styles */
@@ -20,7 +20,7 @@
 }
 
 .user-message {
-  background-color: var(--color-neutral-yellow);
+  background-color: var(--color-neutral-callout);
   border-radius: 1rem;
   padding: 1rem;
   margin-bottom: 1rem;
@@ -32,7 +32,7 @@
   border-radius: 1rem;
   padding: 1rem;
   margin-bottom: 1rem;
-  color: var(--color-white);
+  color: var(--color-light);
 }
 
 .message-input {
@@ -41,13 +41,13 @@
   padding: 0.75rem 1rem;
   width: 100%;
   font-size: 1rem;
-  background-color: var(--color-white);
+  background-color: var(--color-light);
   color: var(--color-dark);
 }
 
 .message-input:focus {
   outline: none;
-  border-color: var(--color-yellow);
+  border-color: var(--color-callout);
   box-shadow: 0 0 0 2px rgba(249, 180, 20, 0.2);
 }
 
@@ -57,7 +57,7 @@ pre {
   border-radius: 0.5rem;
   padding: 1rem;
   overflow-x: auto;
-  color: var(--color-white);
+  color: var(--color-light);
 }
 
 code {
@@ -71,7 +71,7 @@ code {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-white);
+  background: var(--color-light);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -80,5 +80,5 @@ code {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-yellow);
+  background: var(--color-callout);
 }

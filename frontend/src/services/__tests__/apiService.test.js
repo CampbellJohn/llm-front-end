@@ -81,7 +81,19 @@ describe('API Service', () => {
   describe('sendChatRequest', () => {
     it('sends a message with the correct parameters', async () => {
       const messages = [{ role: 'user', content: 'Hello, world!' }];
-      const expectedResponse = { id: '1', content: 'Response' };
+      const expectedResponse = { 
+        id: 'chatcmpl-123',
+        object: 'chat.completion.chunk',
+        created: 1677825464,
+        model: 'gpt-4',
+        choices: [
+          {
+            delta: { content: 'Response' },
+            index: 0,
+            finish_reason: null
+          }
+        ]
+      };
       
       // Mock the fetch implementation used by sendChatRequest
       const mockReader = {

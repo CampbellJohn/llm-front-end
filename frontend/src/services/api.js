@@ -135,20 +135,24 @@ export const sendChatRequest = async (messages, onChunk) => {
       }
     }
     
-    // Process any remaining data in the buffer
+    // Process any remaining data in the buffer with a final flush
     if (buffer.trim()) {
+      const finalBuffer = buffer + decoder.decode(); // Ensure we flush any remaining bytes
+      
       try {
-        const line = buffer.trim();
-        if (line.startsWith('data: ')) {
-          const data = line.slice(6);
-          if (data && data !== '[DONE]') {
-            const parsed = JSON.parse(data);
-            onChunk && onChunk(parsed);
+        const lines = finalBuffer.split('\n\n');
+        for (const line of lines) {
+          const trimmedLine = line.trim();
+          if (trimmedLine.startsWith('data: ')) {
+            const data = trimmedLine.slice(6);
+            if (data && data !== '[DONE]') {
+              const parsed = JSON.parse(data);
+              onChunk && onChunk(parsed);
+            }
           }
         }
       } catch (e) {
         console.error('Error parsing final chunk:', e);
-        throw e;
       }
     }
   } catch (error) {
