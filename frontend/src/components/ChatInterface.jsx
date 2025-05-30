@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ChatMessage from './ChatMessage';
 import MessageInput from './MessageInput';
 
-const ChatInterface = ({ messages, isLoading, isStreaming, error, sendMessage, clearMessages }) => {
+const ChatInterface = ({ messages, isLoading, isStreaming, error, sendMessage, stopStreaming, clearMessages }) => {
   const messagesEndRef = useRef(null);
   const [autoScroll, setAutoScroll] = useState(true);
 
@@ -20,6 +20,11 @@ const ChatInterface = ({ messages, isLoading, isStreaming, error, sendMessage, c
     const { scrollTop, scrollHeight, clientHeight } = e.target;
     const isAtBottom = scrollHeight - (scrollTop + clientHeight) < 100;
     setAutoScroll(isAtBottom);
+  };
+
+  const handleStopClick = (e) => {
+    e.preventDefault();
+    stopStreaming();
   };
 
   return (
@@ -81,11 +86,30 @@ const ChatInterface = ({ messages, isLoading, isStreaming, error, sendMessage, c
 
         {/* Input area */}
         <div className="p-4">
+          {/* Stop button - only show when streaming */}
+          {isStreaming && (
+            <div className="flex justify-center mb-2">
+              <button
+                onClick={handleStopClick}
+                className="px-4 py-2 text-sm font-medium rounded-md"
+                style={{
+                  backgroundColor: '#f9b414',
+                  color: '#25293c',
+                  transition: 'background-color 0.2s',
+                }}
+                onMouseOver={(e) => e.currentTarget.style.opacity = '0.9'}
+                onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
+              >
+                Stop Generating
+              </button>
+            </div>
+          )}
+          
           <div className="p-4" style={{ backgroundColor: '#f9fefc', borderTop: '1px solid #6e7288' }}>
             <MessageInput 
               onSend={sendMessage} 
               isSending={isLoading} 
-              disabled={isStreaming} 
+              disabled={isStreaming && !isLoading} 
             />
             {error && <div className="mt-2 text-sm" style={{ color: '#f9b414' }}>{error}</div>}
           </div>
