@@ -116,7 +116,8 @@ describe('useChat', () => {
     // Should have sent the message
     expect(api.sendChatRequest).toHaveBeenCalledWith(
       [{ role: 'user', content: 'Hello' }],
-      expect.any(Function)
+      expect.any(Function),
+      expect.any(Object) // Expecting the AbortSignal object
     );
     
     // Should have updated the messages

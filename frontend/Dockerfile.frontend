@@ -2,6 +2,10 @@
 FROM node:18-alpine AS builder
 WORKDIR /app
 
+# Add build argument with default value
+ARG SKIP_TESTS=false
+ENV SKIP_TESTS=$SKIP_TESTS
+
 # Copy package files
 COPY package*.json ./
 
@@ -16,8 +20,13 @@ RUN if [ -f package-lock.json ]; then \
 # Copy source code
 COPY . .
 
-# Run tests with verbose output (fails the build if tests don't pass)
-RUN npm test -- --verbose
+# Run tests only if SKIP_TESTS is not 'true'
+RUN if [ "$SKIP_TESTS" != "true" ]; then \
+      echo "Running tests..."; \
+      npm test -- --verbose; \
+    else \
+      echo "Skipping tests as SKIP_TESTS is set to true"; \
+    fi
 
 # Build the app
 RUN npm run build

@@ -10,6 +10,7 @@ function App() {
     isStreaming, 
     error, 
     sendMessage, 
+    stopStreaming,
     clearMessages, 
     loadConversation,
     currentConversationId,
@@ -74,6 +75,7 @@ function App() {
             isStreaming={isStreaming}
             error={error}
             sendMessage={sendMessage}
+            stopStreaming={stopStreaming}
             clearMessages={clearMessages}
           />
         </main>

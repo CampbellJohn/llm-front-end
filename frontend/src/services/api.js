@@ -72,7 +72,7 @@ export const updateConversation = async (id, updates) => {
   }
 };
 
-export const sendChatRequest = async (messages, onChunk) => {
+export const sendChatRequest = async (messages, onChunk, signal) => {
   try {
     const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/chat`, {
       method: 'POST',
@@ -83,6 +83,7 @@ export const sendChatRequest = async (messages, onChunk) => {
         messages,
         stream: true,
       }),
+      signal, // Pass the signal to the fetch request
     });
 
     if (!response.ok) {
@@ -101,6 +102,12 @@ export const sendChatRequest = async (messages, onChunk) => {
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
+
+      // Check if the request was aborted
+      if (signal?.aborted) {
+        reader.cancel();
+        throw new DOMException('The user aborted a request.', 'AbortError');
+      }
 
       // Convert the Uint8Array to a string
       const chunk = decoder.decode(value, { stream: true });
@@ -156,7 +163,12 @@ export const sendChatRequest = async (messages, onChunk) => {
       }
     }
   } catch (error) {
-    console.error('Error in sendChatRequest:', error);
+    // Only re-throw if it's not an abort error
+    if (error.name !== 'AbortError') {
+      console.error('Error in sendChatRequest:', error);
+      throw error;
+    }
+    // For abort errors, we'll just let the calling code handle it
     throw error;
   }
 };

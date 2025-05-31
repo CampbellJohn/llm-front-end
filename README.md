@@ -64,6 +64,14 @@ This command:
 - Automatically removes the test container when done (`--rm` flag)
 - Exits with a non-zero code if tests fail
 
+#### Skip Tests:
+
+To skip tests, set the `SKIP_TESTS` environment variable to `true`:
+
+```bash
+SKIP_TESTS=true docker-compose up --build
+```
+
 ### 4. Start the Docker containers
 
 ```bash
